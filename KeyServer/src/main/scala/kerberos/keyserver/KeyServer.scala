@@ -10,6 +10,7 @@ object KeyServer {
   def main(args: Array[String]) {
     val system = ActorSystem("KeyServerSystem")
     val keyServerActor = system.actorOf(Props[KeyServerActor], name = "KeyServerActor")
+    
     keyServerActor ! "The RemoteActor is alive"
   }
 }

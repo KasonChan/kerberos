@@ -8,8 +8,9 @@ import akka.actor.Actor
 class KeyServerActor extends Actor {
   def receive = {
     case msg: String => {
-      println(s"Key server received message: '$msg'")
-      sender() ! "Hello from the key server"
+      println(self.path.name + s": '$msg'")
+      
+      sender() ! "Hello from " + self.path.name
     }
   }
 }

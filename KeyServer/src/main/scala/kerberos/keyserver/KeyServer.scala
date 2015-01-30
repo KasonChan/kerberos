@@ -8,9 +8,12 @@ import kerberos.keyserver.actor.KeyServerActor
  */
 object KeyServer {
   def main(args: Array[String]) {
+    //    Create key server system
     val system = ActorSystem("KeyServerSystem")
+
+    //    Create key server actor
     val keyServerActor = system.actorOf(Props[KeyServerActor], name = "KeyServerActor")
-    
-    keyServerActor ! "The RemoteActor is alive"
+
+    keyServerActor ! "Key server is alive"
   }
 }

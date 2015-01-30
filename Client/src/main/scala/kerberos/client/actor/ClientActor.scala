@@ -1,21 +1,28 @@
 package kerberos.client.actor
 
 import akka.actor.Actor
+import kerberos.messages.{SessionKeyReply, SessionKeyRequest}
 
 /**
  * Created by kasonchan on 1/29/15.
  */
-class ClientActor extends Actor {
-  // create the remote actor
-  val remote = context.actorSelection("akka.tcp://KeyServerSystem@127.0.0.1:2552/user/KeyServerActor")
-  var counter = 0
+class ClientActor extends Actor with akka.actor.ActorLogging {
+  // Create the remote key server actor
+  val keyServerActor = context.actorSelection("akka.tcp://KeyServerSystem@127.0.0.1:2552/user/KeyServerActor")
 
   def receive = {
-    case "START" => {
-      remote ! "Hello from " + self.path.name
+    case sessionKeyRequest: SessionKeyRequest => {
+      log.info(sessionKeyRequest.toString)
+      keyServerActor ! sessionKeyRequest
+    }
+    case sessionKeyReply: SessionKeyReply => {
+      sessionKeyReply match {
+        case SessionKeyReply(cid, sid, sessionKey, encryptedToken) =>
+          log.info(sessionKeyReply.toString)
+      }
     }
     case msg: String => {
-      println(self.path.name + s": '$msg'")
+      log.info(msg)
     }
   }
 }

@@ -1,12 +1,21 @@
 package kerberos.keyserver.actor
 
 import akka.actor.Actor
+import kerberos.encryption.{ElGamalPrivateKey, ElGamalPublicKey}
 import kerberos.messages.{EncryptedToken, SessionKeyReply, SessionKeyRequest}
 
 /**
  * Created by kasonchan on 1/29/15.
  */
 class KeyServerActor extends Actor with akka.actor.ActorLogging {
+  //  Client public and private keys
+  val clientPublicKey = ElGamalPublicKey(2357, 2351, 36)
+  val clientPrivateKey = ElGamalPrivateKey(2)
+
+  //  Application public and private keys
+  val applicationPublicKey = ElGamalPublicKey(1327,1321,426)
+  val applicationPrivateKey = ElGamalPrivateKey(17)
+
   def receive = {
     case sessionKeyRequest: SessionKeyRequest => {
       sessionKeyRequest match {

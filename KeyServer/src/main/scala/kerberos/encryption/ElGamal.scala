@@ -14,7 +14,7 @@ case class ElGamalEncryptedMsg(t: BigInt, o: BigInt)
 trait ElGamal extends General {
   /**
    * Returns public key and private key*
-   * @param r Integer
+   * @param r BigInt
    * @return (public key, private key)
    */
   def ElGamal_GenerateKeyPair(r: BigInt): (ElGamalPublicKey, ElGamalPrivateKey) = {
@@ -32,10 +32,22 @@ trait ElGamal extends General {
   }
 
   /**
-   * Return the encrypted message (t, o)*
+   * Returns encrypted message *
+   * @param publicKey ElGamalPublicKey(p: BigInt, alpha: BigInt, aa: BigInt)
+   * @param m List[BigInt]
+   * @return result: List[ElGamalEncryptedMsg(t: BigInt, o: BigInt)]
+   */
+  def ElGamal_EncryptMessage(publicKey: ElGamalPublicKey, m: List[BigInt]) = {
+    val result = m.map(m => ElGamal_Encrypt(publicKey, m)).toList
+
+    result
+  }
+
+  /**
+   * Returns the encrypted message (t, o) *
    * @param publicKey ElGamalPublicKey
-   * @param m String
-   * @return (t, o)
+   * @param m BigInt
+   * @return ElGamalEncryptedMsg(t: BigInt, o: BigInt)
    */
   def ElGamal_Encrypt(publicKey: ElGamalPublicKey, m: BigInt): ElGamalEncryptedMsg = {
     val p = publicKey.p
@@ -50,14 +62,28 @@ trait ElGamal extends General {
   }
 
   /**
+   * Returns decrypted message *
+   * @param publicKey ElGamalPublicKey(p: BigInt, alpha: BigInt, aa: BigInt)
+   * @param privateKey ElGamalPrivateKey(a: BigInt)
+   * @param c Seq[ElGamalEncryptedMsg]
+   * @return String
+   */
+  def ElGamal_DecryptMessage(publicKey: ElGamalPublicKey, privateKey: ElGamalPrivateKey,
+                             c: Seq[ElGamalEncryptedMsg]) = {
+    val result = c.map(c => ElGamal_Decrypt(publicKey, privateKey, c)).toList
+
+    bigIntToString(result)
+  }
+
+  /**
    * Returns the decrypted message *
-   * @param publicKey ElGamalPublicKey
-   * @param privateKey ElGamalPrivateKey
-   * @param c Encrypted message
-   * @return Decrypted message: Int
+   * @param publicKey ElGamalPublicKey(p: BigInt, alpha: BigInt, aa: BigInt)
+   * @param privateKey ElGamalPrivateKey(a: BigInt)
+   * @param c ElGamalEncryptedMsg(t: BigInt, o: BigInt)
+   * @return Decrypted message: BigInt
    */
   def ElGamal_Decrypt(publicKey: ElGamalPublicKey, privateKey: ElGamalPrivateKey,
-                      c: ElGamalEncryptedMsg): Int = {
+                      c: ElGamalEncryptedMsg): BigInt = {
     val p = publicKey.p
     val alpha = publicKey.alpha
     val a = privateKey.a
@@ -67,7 +93,6 @@ trait ElGamal extends General {
     val t = c.t.pow((p - 1 - a).toInt) % p
     val m = t * (c.o % p)
 
-    m.toInt
+    m
   }
 }
-

@@ -1,19 +1,19 @@
 package kerberos.keyserver.actor
 
 import akka.actor.Actor
-import kerberos.encryption.{ElGamalPrivateKey, ElGamalPublicKey}
-import kerberos.messages.{EncryptedToken, SessionKeyReply, SessionKeyRequest}
+import kerberos.encryption.{ElGamal, ElGamalPrivateKey, ElGamalPublicKey}
+import kerberos.messages.{EncryptedSessionKey, EncryptedToken, SessionKeyReply, SessionKeyRequest}
 
 /**
  * Created by kasonchan on 1/29/15.
  */
-class KeyServerActor extends Actor with akka.actor.ActorLogging {
+class KeyServerActor extends Actor with akka.actor.ActorLogging with ElGamal {
   //  Client public and private keys
-  val clientPublicKey = ElGamalPublicKey(2357, 2351, 36)
-  val clientPrivateKey = ElGamalPrivateKey(2)
+  val clientPublicKey = ElGamalPublicKey(1579, 1571, 677)
+  val clientPrivateKey = ElGamalPrivateKey(11)
 
   //  Application public and private keys
-  val applicationPublicKey = ElGamalPublicKey(1327,1321,426)
+  val applicationPublicKey = ElGamalPublicKey(1327, 1321, 426)
   val applicationPrivateKey = ElGamalPrivateKey(17)
 
   def receive = {
@@ -23,19 +23,38 @@ class KeyServerActor extends Actor with akka.actor.ActorLogging {
           //          TODO: Add database
           log.info(sessionKeyRequest.toString)
 
-          val sessionKey = 139
-
           //          Construct encrypted token
-          val t = EncryptedToken(cid, sid, 139)
+          val bCID = stringToBigInt(cid) // BigInt cid
+          val bSID = stringToBigInt(sid) // BigInt sid
 
-          //          TODO: Encrypt token
-          val et = EncryptedToken(t.CID, t.SID, t.SessionKey)
+          val eTCID = ElGamal_EncryptMessage(applicationPublicKey, bCID)
+          val eTSID = ElGamal_EncryptMessage(applicationPublicKey, bSID)
+
+          val tSessionKey = clientPublicKey
+
+          val eTSessionKeyP = ElGamal_Encrypt(applicationPublicKey, tSessionKey.p)
+          val eTSessionKeyAlpha = ElGamal_Encrypt(applicationPublicKey, tSessionKey.alpha)
+          val eTSessionKeyAA = ElGamal_Encrypt(applicationPublicKey, tSessionKey.aa)
+
+          val eTSessionKey = EncryptedSessionKey(eTSessionKeyP, eTSessionKeyAlpha, eTSessionKeyAA)
+
+          //          Encrypt token
+          val et = EncryptedToken(eTCID, eTSID, eTSessionKey)
 
           //          Construct session key reply
-          val r = SessionKeyReply(cid, sid, sessionKey, et)
+          val eCID = ElGamal_EncryptMessage(clientPublicKey, bCID)
+          val eSID = ElGamal_EncryptMessage(clientPublicKey, bSID)
 
-          //          TODO: Encrypt session key reply
-          val er = SessionKeyReply(cid, sid, sessionKey, et)
+          val sessionKey = applicationPublicKey
+
+          val eSessionKeyP = ElGamal_Encrypt(clientPublicKey, sessionKey.p)
+          val eSessionKeyAlpha = ElGamal_Encrypt(clientPublicKey, sessionKey.alpha)
+          val eSessionKeyAA = ElGamal_Encrypt(clientPublicKey, sessionKey.aa)
+
+          val eSessionKey = EncryptedSessionKey(eSessionKeyP, eSessionKeyAlpha, eSessionKeyAA)
+
+          //          Encrypt session key reply
+          val er = SessionKeyReply(eCID, eSID, eSessionKey, et)
 
           sender() ! er
 

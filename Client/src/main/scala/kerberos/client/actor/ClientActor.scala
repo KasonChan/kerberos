@@ -2,7 +2,7 @@ package kerberos.client.actor
 
 import akka.actor.Actor
 import kerberos.encryption.{ElGamal, ElGamalPrivateKey, ElGamalPublicKey}
-import kerberos.messages.{SessionKeyReply, SessionKeyRequest}
+import kerberos.messages.{SessionKeyReply, SessionKeyRequest, Exit}
 
 /**
  * Created by kasonchan on 1/29/15.
@@ -39,6 +39,11 @@ class ClientActor extends Actor with akka.actor.ActorLogging with ElGamal {
     }
     case msg: String => {
       log.info(msg)
+    }
+    case Exit => {
+      log.info("Exit")
+      context.stop(self)
+      context.system.shutdown()
     }
   }
 }

@@ -4,9 +4,16 @@ import akka.actor.Actor
 import kerberos.encryption.{ElGamal, ElGamalPrivateKey, ElGamalPublicKey}
 import kerberos.messages.{EncryptedSessionKey, EncryptedToken, SessionKeyReply, SessionKeyRequest}
 
+
 /**
  * Created by kasonchan on 1/29/15.
  */
+object KeyServerActor {
+
+  case object Exit
+
+}
+
 class KeyServerActor extends Actor with akka.actor.ActorLogging with ElGamal {
   //  Client public and private keys
   val clientPublicKey = ElGamalPublicKey(1579, 1571, 677)
@@ -64,6 +71,10 @@ class KeyServerActor extends Actor with akka.actor.ActorLogging with ElGamal {
     }
     case msg: String => {
       log.info(msg)
+    }
+    case KeyServerActor.Exit => {
+      log.info("Exit")
+      context.system.shutdown()
     }
   }
 }

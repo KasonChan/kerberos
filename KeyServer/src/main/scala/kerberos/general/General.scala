@@ -137,35 +137,6 @@ trait General {
   }
 
   /**
-   * Returns the multiplicative inverse of positive integer m *
-   * @param m Integer
-   * @return Seq[Int]
-   */
-  def multiplicativeInverse(m: Int): Option[Seq[Int]] = {
-    val r = residues(m)
-
-    val i = for {
-      x <- r
-      y <- r
-      if (mod((x * y), m) == 1)
-    } yield x
-
-    if (i.nonEmpty) Some(i)
-    else None
-  }
-
-  /**
-   * Returns a set of residues of remainders obtained by dividing positive
-   * integers by a chosen positive number m *
-   * @param m modulus: Integer
-   * @return Seq[Int]
-   */
-  def residues(m: Int): Seq[Int] = {
-    for (i <- 0 until m)
-    yield i
-  }
-
-  /**
    * Returns the result of n mod m *
    * @param n Integer
    * @param m Integer
@@ -181,6 +152,35 @@ trait General {
     else {
       n % m
     }
+  }
+
+  /**
+   * Returns a set of residues of remainders obtained by dividing positive
+   * integers by a chosen positive number m *
+   * @param m modulus: Integer
+   * @return Seq[Int]
+   */
+  def residues(m: Int): Seq[Int] = {
+    for (i <- 0 until m)
+    yield i
+  }
+
+  /**
+   * Returns the multiplicative inverse of positive integer m *
+   * @param m Integer
+   * @return Seq[Int]
+   */
+  def multiplicativeInverse(m: Int): Option[Seq[Int]] = {
+    val r = residues(m)
+
+    val i = for {
+      x <- r
+      y <- r
+      if (mod((x * y), m) == 1)
+    } yield x
+
+    if (i.nonEmpty) Some(i)
+    else None
   }
 }
 

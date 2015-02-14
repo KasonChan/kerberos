@@ -24,7 +24,7 @@ class IO(client: ActorRef) {
     input match {
       case m: String => {
         client ! m
-        
+
         //        TODO: Implement messages
         m match {
           case add(num1, num2) => println(num1 + " + " + num2)

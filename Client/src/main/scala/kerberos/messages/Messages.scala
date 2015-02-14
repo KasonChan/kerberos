@@ -38,8 +38,3 @@ case class EncryptedToken(CID: List[ElGamalEncryptedMsg], SID: List[ElGamalEncry
  * @param encryptedToken Encrypted session key token: EncryptedToken
  */
 case class SessionKeyReply(CID: List[ElGamalEncryptedMsg], SID: List[ElGamalEncryptedMsg], SessionKey: EncryptedSessionKey, encryptedToken: EncryptedToken)
-
-/**
- * Exit *
- */
-case object Exit

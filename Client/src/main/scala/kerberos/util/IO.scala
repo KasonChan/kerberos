@@ -1,7 +1,7 @@
 package kerberos.util
 
 import akka.actor.ActorRef
-import kerberos.messages.Exit
+import kerberos.client.actor.ClientActor.Exit
 
 import scala.io.StdIn._
 
@@ -23,7 +23,6 @@ class IO(client: ActorRef) {
 
     input match {
       case m: String => {
-        client ! m
 
         //        TODO: Implement messages
         m match {
@@ -35,11 +34,11 @@ class IO(client: ActorRef) {
             client ! Exit
             "exit"
           }
-          case _ => println("Error - undefined operation")
+          case x => println("Error - undefined operation: " + x)
         }
       }
       case x => {
-        println("Error - undefined command")
+        println("Error - undefined command: " + x)
       }
     }
   }

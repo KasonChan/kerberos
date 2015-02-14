@@ -15,6 +15,14 @@ object KeyServerActor {
 }
 
 class KeyServerActor extends Actor with akka.actor.ActorLogging with ElGamal {
+  override def preStart(): Unit = {
+    log.info("Pre-start")
+  }
+
+  override def postStop(): Unit = {
+    log.info("Post-stop")
+  }
+  
   //  Client public and private keys
   val clientPublicKey = ElGamalPublicKey(1579, 1571, 677)
   val clientPrivateKey = ElGamalPrivateKey(11)

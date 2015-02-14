@@ -2,7 +2,7 @@ package kerberos.client.actor
 
 import akka.actor.{Actor, ActorSelection, Props}
 import kerberos.encryption.{ElGamal, ElGamalPrivateKey, ElGamalPublicKey}
-import kerberos.messages.{Exit, SessionKeyReply, SessionKeyRequest}
+import kerberos.messages.{SessionKeyReply, SessionKeyRequest}
 
 /**
  * Created by kasonchan on 1/29/15.
@@ -11,6 +11,8 @@ object ClientActor {
   //  Application hostname and port
   def props(aHostname: String, aPort: String): Props =
     Props(new ClientActor(aHostname, aPort))
+
+  case object Exit
 }
 
 class ClientActor(aHostname: String, aPort: String) extends Actor
@@ -18,10 +20,17 @@ with akka.actor.ActorLogging with ElGamal {
   //  Create the remote key server actor
   val keyServerActor: ActorSelection =
     context.actorSelection("akka.tcp://KeyServerSystem@127.0.0.1:2552/user/KeyServerActor")
-
   //  Client public and private keys
   val publicKey = ElGamalPublicKey(1579, 1571, 677)
   val privateKey = ElGamalPrivateKey(11)
+
+  override def preStart(): Unit = {
+    log.info("Pre-start")
+  }
+
+  override def postStop(): Unit = {
+    log.info("Post-stop")
+  }
 
   def receive = {
     case sessionKeyRequest: SessionKeyRequest => {
@@ -48,7 +57,7 @@ with akka.actor.ActorLogging with ElGamal {
     case msg: String => {
       log.info(msg)
     }
-    case Exit => {
+    case ClientActor.Exit => {
       log.info("Exit")
       context.system.shutdown()
     }

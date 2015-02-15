@@ -35,7 +35,7 @@ with akka.actor.ActorLogging with ElGamal {
   def receive = {
     case sessionKeyRequest: SessionKeyRequest => {
       log.info(sender() + " " + sessionKeyRequest.toString)
-      
+
       keyServerActor ! sessionKeyRequest
     }
     case sessionKeyReply: SessionKeyReply => {

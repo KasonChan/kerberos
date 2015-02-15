@@ -7,6 +7,9 @@ import kerberos.util.IO
 /**
  * Created by kasonchan on 1/29/15.
  */
+
+case object Test
+
 object KeyServer {
   def main(args: Array[String]) {
     //    Create key server system
@@ -18,6 +21,8 @@ object KeyServer {
 
     keyServerActor ! "Key server is alive"
 
+    keyServerActor ! Test
+    
     do {
     } while (io.input() != "exit")
   }

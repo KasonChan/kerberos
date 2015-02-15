@@ -8,7 +8,6 @@ import kerberos.messages.{SessionKeyReply, SessionKeyRequest}
  * Created by kasonchan on 1/29/15.
  */
 object ClientActor {
-
   //  Application hostname and port
   def props(aHostname: String, aPort: String): Props =
     Props(new ClientActor(aHostname, aPort))

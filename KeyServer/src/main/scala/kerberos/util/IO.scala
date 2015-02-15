@@ -1,7 +1,6 @@
 package kerberos.util
 
 import akka.actor.ActorRef
-import kerberos.keyserver.actor.KeyServerActor.Exit
 
 import scala.io.StdIn._
 
@@ -19,7 +18,7 @@ class IO(keyServerSupervisor: ActorRef) {
       case m: String => {
         m match {
           case exit() =>
-            keyServerSupervisor ! Exit
+            keyServerSupervisor ! "exit"
             "exit"
           case x =>
             println("Error - undefined command: " + x)

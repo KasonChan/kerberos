@@ -8,21 +8,7 @@ import kerberos.messages.{EncryptedSessionKey, EncryptedToken, SessionKeyReply, 
 /**
  * Created by kasonchan on 1/29/15.
  */
-object KeyServerActor {
-
-  case object Exit
-
-}
-
 class KeyServerActor extends Actor with akka.actor.ActorLogging with ElGamal {
-  override def preStart(): Unit = {
-    log.info("Pre-start")
-  }
-
-  override def postStop(): Unit = {
-    log.info("Post-stop")
-  }
-  
   //  Client public and private keys
   val clientPublicKey = ElGamalPublicKey(1579, 1571, 677)
   val clientPrivateKey = ElGamalPrivateKey(11)
@@ -30,6 +16,14 @@ class KeyServerActor extends Actor with akka.actor.ActorLogging with ElGamal {
   //  Application public and private keys
   val applicationPublicKey = ElGamalPublicKey(1327, 1321, 426)
   val applicationPrivateKey = ElGamalPrivateKey(17)
+
+  override def preStart(): Unit = {
+    log.info("Pre-start")
+  }
+
+  override def postStop(): Unit = {
+    log.info("Post-stop")
+  }
 
   def receive = {
     case sessionKeyRequest: SessionKeyRequest => {
@@ -78,11 +72,16 @@ class KeyServerActor extends Actor with akka.actor.ActorLogging with ElGamal {
       }
     }
     case msg: String => {
-      log.info(msg)
+      msg match {
+        case "exit" =>
+          log.info(msg)
+          context.system.shutdown()
+        case x =>
+          log.warning("Undefined operation: " + x)
+      }
     }
-    case KeyServerActor.Exit => {
-      log.info("Exit")
-      context.system.shutdown()
+    case x => {
+      log.warning("Undefined operation: " + x.toString)
     }
   }
 }

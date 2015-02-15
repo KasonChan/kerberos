@@ -1,4 +1,4 @@
-package kerberos.client.actor
+package kerberos.keyserver.actor
 
 import akka.actor.{Actor, ActorRef, Props}
 import akka.routing.{ActorRefRoutee, Router, SmallestMailboxRoutingLogic}
@@ -7,18 +7,12 @@ import kerberos.messages.{SessionKeyReply, SessionKeyRequest}
 /**
  * Created by kasonchan on 2/15/15.
  */
-
-object ClientSupervisor {
-  //  Application hostname and port
-  def props(aHostname: String, aPort: String): Props =
-    Props(new ClientActor(aHostname, aPort))
-}
-
-class ClientSupervisor(aHostname: String, aPort: String) extends Actor with akka.actor.ActorLogging {
-  //  Create router containing 5 routee of client actor
+class KeyServerSupervisor extends Actor with akka.actor.ActorLogging {
+  //  Create router containing 5 routee of key server actor
+  // using smallest mail box routing logic
   var router: Router = {
     val routees: Vector[ActorRefRoutee] = Vector.fill(5) {
-      val r: ActorRef = context.actorOf(Props[ClientActor])
+      val r: ActorRef = context.actorOf(Props[KeyServerActor])
       context watch r
       ActorRefRoutee(r)
     }

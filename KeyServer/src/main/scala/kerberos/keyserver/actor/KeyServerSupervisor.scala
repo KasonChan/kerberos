@@ -29,11 +29,11 @@ class KeyServerSupervisor extends Actor with akka.actor.ActorLogging {
 
   def receive = {
     case sessionKeyRequest: SessionKeyRequest => {
-      log.info(sessionKeyRequest.toString)
+      log.info(sender() + " " + sessionKeyRequest.toString)
       router.route(sessionKeyRequest, sender())
     }
     case sessionKeyReply: SessionKeyReply => {
-      log.info(sessionKeyReply.toString)
+      log.info(sender() + " " + sessionKeyReply.toString)
       router.route(sessionKeyReply, sender())
     }
     case msg: String => {
@@ -42,11 +42,11 @@ class KeyServerSupervisor extends Actor with akka.actor.ActorLogging {
           log.info(msg)
           context.system.shutdown()
         case x =>
-          log.warning("Undefined operation: " + x)
+          log.warning("Undefined operation: " + sender() + " " + x)
       }
     }
     case x => {
-      log.warning("Undefined operation: " + x.toString)
+      log.warning("Undefined operation: " + sender() + " " + x.toString)
     }
   }
 }

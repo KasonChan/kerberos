@@ -34,13 +34,14 @@ with akka.actor.ActorLogging with ElGamal {
 
   def receive = {
     case sessionKeyRequest: SessionKeyRequest => {
-      log.info(sessionKeyRequest.toString)
+      log.info(sender() + " " + sessionKeyRequest.toString)
+      
       keyServerActor ! sessionKeyRequest
     }
     case sessionKeyReply: SessionKeyReply => {
       sessionKeyReply match {
         case SessionKeyReply(cid, sid, sessionKey, encryptedToken) =>
-          log.info(sessionKeyReply.toString)
+          log.info(sender() + " " + sessionKeyReply.toString)
 
           val dCID = ElGamal_DecryptMessage(publicKey, privateKey, cid)
           val dSID = ElGamal_DecryptMessage(publicKey, privateKey, sid)
@@ -59,11 +60,11 @@ with akka.actor.ActorLogging with ElGamal {
 
       msg match {
         case "exit" => context.system.shutdown()
-        case x => log.warning("Undefined operation: " + x)
+        case x => log.warning("Undefined operation: " + sender() + " " + x)
       }
     }
     case x => {
-      log.warning("Undefined operation: " + x.toString)
+      log.warning("Undefined operation: " + sender() + " " + x.toString)
     }
   }
 }

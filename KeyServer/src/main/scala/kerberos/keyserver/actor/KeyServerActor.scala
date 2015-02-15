@@ -4,7 +4,6 @@ import akka.actor.Actor
 import kerberos.encryption.{ElGamal, ElGamalPrivateKey, ElGamalPublicKey}
 import kerberos.messages.{EncryptedSessionKey, EncryptedToken, SessionKeyReply, SessionKeyRequest}
 
-
 /**
  * Created by kasonchan on 1/29/15.
  */
@@ -30,7 +29,7 @@ class KeyServerActor extends Actor with akka.actor.ActorLogging with ElGamal {
       sessionKeyRequest match {
         case SessionKeyRequest(cid, sid) => {
           //          TODO: Add database
-          log.info(sessionKeyRequest.toString)
+          log.info(sender() + " " + sessionKeyRequest.toString)
 
           //          Construct encrypted token
           val bCID = stringToBigInt(cid) // BigInt cid
@@ -77,11 +76,11 @@ class KeyServerActor extends Actor with akka.actor.ActorLogging with ElGamal {
           log.info(msg)
           context.system.shutdown()
         case x =>
-          log.warning("Undefined operation: " + x)
+          log.warning("Undefined operation: " + sender() + " " + x)
       }
     }
     case x => {
-      log.warning("Undefined operation: " + x.toString)
+      log.warning("Undefined operation: " + sender() + " " + x.toString)
     }
   }
 }

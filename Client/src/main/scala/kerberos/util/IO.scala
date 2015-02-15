@@ -1,14 +1,15 @@
 package kerberos.util
 
 import akka.actor.ActorRef
-import kerberos.client.actor.ClientActor.Exit
 
 import scala.io.StdIn._
+
+case class test(x: Int)
 
 /**
  * Created by kasonchan on 2/11/15.
  */
-class IO(client: ActorRef) {
+class IO(clientSupervisor: ActorRef) {
   //  Capital letters or small letters of exit to exit program
   val exit = """[eE][xX][iI][tT]""".r
 
@@ -26,15 +27,19 @@ class IO(client: ActorRef) {
 
         //        TODO: Implement messages
         m match {
-          case add(num1, num2) => println(num1 + " + " + num2)
-          case subtract(num1, num2) => println(num1 + " - " + num2)
-          case multiple(num1, num2) => println(num1 + " * " + num2)
-          case divide(num1, num2) => println(num1 + " / " + num2)
-          case exit() => {
-            client ! Exit
+          case add(num1, num2) =>
+            println(num1 + " + " + num2)
+          case subtract(num1, num2) =>
+            println(num1 + " - " + num2)
+          case multiple(num1, num2) =>
+            println(num1 + " * " + num2)
+          case divide(num1, num2) =>
+            println(num1 + " / " + num2)
+          case exit() =>
+            clientSupervisor ! "exit"
             "exit"
-          }
-          case x => println("Error - undefined operation: " + x)
+          case x =>
+            println("Error - undefined operation: " + x)
         }
       }
       case x => {

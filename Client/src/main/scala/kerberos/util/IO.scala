@@ -1,6 +1,7 @@
 package kerberos.util
 
 import akka.actor.ActorRef
+import kerberos.messages.SessionKeyRequest
 
 import scala.io.StdIn._
 
@@ -35,6 +36,8 @@ class IO(clientSupervisor: ActorRef) {
             println(num1 + " * " + num2)
           case divide(num1, num2) =>
             println(num1 + " / " + num2)
+          case "test application" =>
+            clientSupervisor ! "test application"
           case exit() =>
             clientSupervisor ! "exit"
             "exit"

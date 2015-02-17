@@ -17,9 +17,12 @@ class ClientActor(aHostname: String, aPort: String) extends Actor
 with akka.actor.ActorLogging with ElGamal {
 
   //  Create the remote key server actor
-  val keyServerActor: ActorSelection =
+  val keyServerSupervisor: ActorSelection =
     context.actorSelection("akka.tcp://KeyServerSystem@127.0.0.1:2552/user/KeyServerSupervisor")
 
+  val applicationSupervisor: ActorSelection =
+    context.actorSelection("akka.tcp://ApplicationSystem@" + aHostname + ":" + aPort + "/user/ApplicationSupervisor")
+  
   //  Client public and private keys
   val publicKey = ElGamalPublicKey(1579, 1571, 677)
   val privateKey = ElGamalPrivateKey(11)
@@ -36,7 +39,7 @@ with akka.actor.ActorLogging with ElGamal {
     case sessionKeyRequest: SessionKeyRequest => {
       log.info(sender() + " " + sessionKeyRequest.toString)
 
-      keyServerActor ! sessionKeyRequest
+      keyServerSupervisor ! sessionKeyRequest
     }
     case sessionKeyReply: SessionKeyReply => {
       sessionKeyReply match {
@@ -53,6 +56,9 @@ with akka.actor.ActorLogging with ElGamal {
           val dSessionKey = ElGamalPublicKey(dSessionKeyP, dSessionKeyAlpha, dSessionKeyAA)
 
           log.info(dCID + " " + dSID + " " + dSessionKey)
+          
+          if ((cid != dCID) || (sid != dSID))
+            log.warning("Unsafe message")
       }
     }
     case msg: String => {
@@ -60,6 +66,7 @@ with akka.actor.ActorLogging with ElGamal {
 
       msg match {
         case "exit" => context.system.shutdown()
+        case "test application" => applicationSupervisor ! msg
         case x => log.warning("Undefined operation: " + sender() + " " + x)
       }
     }

@@ -49,6 +49,9 @@ class ClientSupervisor(aHostname: String, aPort: String) extends Actor with akka
         case "exit" =>
           log.info(msg)
           context.system.shutdown()
+        case "test application" =>
+          log.info(msg)
+          router.route(msg, sender())
         case x =>
           log.warning("Undefined operation: " + sender() + " " + x)
       }

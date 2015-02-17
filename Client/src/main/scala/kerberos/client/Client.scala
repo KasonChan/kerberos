@@ -2,7 +2,6 @@ package kerberos.client
 
 import akka.actor.ActorSystem
 import kerberos.client.actor.ClientSupervisor
-import kerberos.messages.SessionKeyRequest
 import kerberos.util.IO
 
 /**
@@ -20,8 +19,6 @@ object Client {
         val clientSupervisor = system.actorOf(ClientSupervisor.props("127.0.0.1", "2554"), name = "ClientSupervisor")
         val io = new IO(clientSupervisor)
 
-        clientSupervisor ! SessionKeyRequest("A", "B")
-
         do {
         } while (io.input() != "exit")
       }
@@ -30,8 +27,6 @@ object Client {
         //        Application server host name args(0), port number args(1)
         val clientSupervisor = system.actorOf(ClientSupervisor.props(args(0), args(1)), name = "ClientSupervisor")
         val io = new IO(clientSupervisor)
-
-        clientSupervisor ! SessionKeyRequest("A", "B")
 
         do {
         } while (io.input() != "exit")

@@ -18,7 +18,7 @@ with akka.actor.ActorLogging with ElGamal {
 
   //  Create the remote key server actor
   val keyServerActor: ActorSelection =
-    context.actorSelection("akka.tcp://KeyServerSystem@127.0.0.1:2552/user/KeyServerActor")
+    context.actorSelection("akka.tcp://KeyServerSystem@127.0.0.1:2552/user/KeyServerSupervisor")
 
   //  Client public and private keys
   val publicKey = ElGamalPublicKey(1579, 1571, 677)

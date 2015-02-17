@@ -1,7 +1,7 @@
 package kerberos.keyserver
 
 import akka.actor.{ActorSystem, Props}
-import kerberos.keyserver.actor.KeyServerActor
+import kerberos.keyserver.actor.KeyServerSupervisor
 import kerberos.util.IO
 
 /**
@@ -16,13 +16,13 @@ object KeyServer {
     val system = ActorSystem("KeyServerSystem")
 
     //    Create key server actor
-    val keyServerActor = system.actorOf(Props[KeyServerActor], name = "KeyServerActor")
-    val io = new IO(keyServerActor)
+    val keyServerSupervisor = system.actorOf(Props[KeyServerSupervisor], name = "KeyServerSupervisor")
+    val io = new IO(keyServerSupervisor)
 
-    keyServerActor ! "Key server is alive"
+    keyServerSupervisor ! "Key server is alive"
 
-    keyServerActor ! Test
-    
+    keyServerSupervisor ! Test
+
     do {
     } while (io.input() != "exit")
   }

@@ -26,7 +26,7 @@ class ApplicationSupervisor extends Actor with akka.actor.ActorLogging {
           log.info(msg)
           context.system.shutdown()
         case "test application" =>
-          log.info(msg)
+          log.info(sender() + " " + msg)
           router.route(msg, sender())
         case x =>
           log.warning("Undefined operation: " + sender() + " " + x)

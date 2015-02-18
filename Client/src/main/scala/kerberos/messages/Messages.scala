@@ -1,12 +1,12 @@
 package kerberos.messages
 
-import kerberos.encryption.ElGamalEncryptedMsg
+import kerberos.encryption.{ElGamalPublicKey, ElGamalEncryptedMsg}
 
 /**
  * Created by kasonchan on 1/29/15.
  */
 /**
- * Request session key message *
+ * Requests session key message *
  * @param CID Client id: String
  * @param SID Application server id: String
  */
@@ -39,6 +39,26 @@ case class EncryptedToken(CID: List[ElGamalEncryptedMsg], SID: List[ElGamalEncry
  */
 case class SessionKeyReply(CID: List[ElGamalEncryptedMsg], SID: List[ElGamalEncryptedMsg], SessionKey: EncryptedSessionKey, encryptedToken: EncryptedToken)
 
-case class EncryptedService(serviceName: List[ElGamalEncryptedMsg], args: List[ElGamalEncryptedMsg])
+/**
+ * Decrypted replied session key message *
+ * @param CID Decrypted client id: String
+ * @param SID Decrypted application server id: String
+ * @param SessionKey Decrypted session key: ElGamalPublicKey(p: BigInt, alpha: BigInt, aa: BigInt)
+ * @param encryptedToken Encrypted session key token: EncryptedToken
+ */
+case class DecryptedSessionKeyReply(CID: String, SID: String, SessionKey: ElGamalPublicKey, encryptedToken: EncryptedToken)
 
-case class ServiceRequest(CID: List[ElGamalEncryptedMsg])
+/**
+ * Application service message * 
+ * @param name Encrypted name of the service: List[ElGamalEncryptedMsg]
+ * @param args Encrypted arguments: List[List[ElGamalEncryptedMsg\]\]
+ */
+case class Service(name: String, args: List[String])
+
+/**
+ * Requests service *
+ * @param CID Encrypted client id: List[ElGamalEncryptedMsg]
+ * @param Service Service: Service
+ * @param encryptedToken Encrypted session key token: EncryptedToken
+ */
+case class ServiceRequest(CID: String, Service: Service, encryptedToken: EncryptedToken)

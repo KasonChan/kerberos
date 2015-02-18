@@ -1,8 +1,13 @@
 package kerberos.client.actor
 
 import akka.actor.{Actor, ActorSelection, Props}
+import akka.pattern.ask
+import akka.util.Timeout
 import kerberos.encryption.{ElGamal, ElGamalPrivateKey, ElGamalPublicKey}
-import kerberos.messages.{SessionKeyReply, SessionKeyRequest}
+import kerberos.messages.{DecryptedSessionKeyReply, ServiceRequest, SessionKeyReply, SessionKeyRequest}
+
+import scala.concurrent.duration._
+import scala.concurrent.{Await, Future}
 
 /**
  * Created by kasonchan on 1/29/15.
@@ -22,7 +27,7 @@ with akka.actor.ActorLogging with ElGamal {
 
   val applicationSupervisor: ActorSelection =
     context.actorSelection("akka.tcp://ApplicationSystem@" + aHostname + ":" + aPort + "/user/ApplicationSupervisor")
-  
+
   //  Client public and private keys
   val publicKey = ElGamalPublicKey(1579, 1571, 677)
   val privateKey = ElGamalPrivateKey(11)
@@ -56,10 +61,12 @@ with akka.actor.ActorLogging with ElGamal {
           val dSessionKey = ElGamalPublicKey(dSessionKeyP, dSessionKeyAlpha, dSessionKeyAA)
 
           log.info(dCID + " " + dSID + " " + dSessionKey)
-          
-          if ((cid != dCID) || (sid != dSID))
-            log.warning("Unsafe message")
       }
+    }
+    case serviceRequest: ServiceRequest => {
+      log.info(sender() + " " + serviceRequest.toString)
+
+      applicationSupervisor ! serviceRequest
     }
     case msg: String => {
       log.info(msg)

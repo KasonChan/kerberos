@@ -28,21 +28,36 @@ class IO(clientSupervisor: ActorRef) {
 
         //        TODO: Implement messages
         m match {
-          case add(num1, num2) =>
+          case add(num1, num2) => {
             println(num1 + " + " + num2)
-          case subtract(num1, num2) =>
+
+            clientSupervisor ! SessionKeyRequest("A", "B")
+          }
+          case subtract(num1, num2) => {
             println(num1 + " - " + num2)
-          case multiple(num1, num2) =>
+
+            clientSupervisor ! SessionKeyRequest("A", "B")
+          }
+          case multiple(num1, num2) => {
             println(num1 + " * " + num2)
-          case divide(num1, num2) =>
+
+            clientSupervisor ! SessionKeyRequest("A", "B")
+          }
+          case divide(num1, num2) => {
             println(num1 + " / " + num2)
-          case "test application" =>
+
+            clientSupervisor ! SessionKeyRequest("A", "B")
+          }
+          case "test application" => {
             clientSupervisor ! "test application"
-          case exit() =>
+          }
+          case exit() => {
             clientSupervisor ! "exit"
             "exit"
-          case x =>
+          }
+          case x => {
             println("Error - undefined operation: " + x)
+          }
         }
       }
       case x => {

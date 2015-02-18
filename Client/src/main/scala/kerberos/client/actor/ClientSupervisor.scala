@@ -2,7 +2,7 @@ package kerberos.client.actor
 
 import akka.actor.{Actor, ActorRef, Props}
 import akka.routing.{ActorRefRoutee, Router, SmallestMailboxRoutingLogic}
-import kerberos.messages.{SessionKeyReply, SessionKeyRequest}
+import kerberos.messages.{ServiceRequest, SessionKeyReply, SessionKeyRequest}
 
 /**
  * Created by kasonchan on 2/15/15.
@@ -43,6 +43,11 @@ class ClientSupervisor(aHostname: String, aPort: String) extends Actor with akka
       log.info(sender() + " " + sessionKeyReply.toString)
 
       router.route(sessionKeyReply, sender())
+    }
+    case serviceRequest: ServiceRequest => {
+      log.info(sender() + " " + serviceRequest.toString)
+
+      router.route(serviceRequest, sender())
     }
     case msg: String => {
       msg match {

@@ -1,7 +1,7 @@
 package kerberos.client
 
-import akka.actor.ActorSystem
-import kerberos.client.actor.ClientSupervisor
+import akka.actor.{DeadLetter, Props, ActorSystem}
+import kerberos.client.actor.{Listener, ClientSupervisor}
 import kerberos.util.IO
 
 /**
@@ -12,6 +12,10 @@ object Client {
   implicit val system = ActorSystem("ClientSystem")
 
   def main(args: Array[String]) {
+    //    Create event listener actor
+    val listener = system.actorOf(Props(classOf[Listener]))
+    system.eventStream.subscribe(listener, classOf[DeadLetter])
+    
     args.size match {
       case 0 => {
         //        Create default client supervisor actor

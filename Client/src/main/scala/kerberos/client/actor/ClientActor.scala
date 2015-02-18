@@ -45,6 +45,8 @@ with akka.actor.ActorLogging with ElGamal {
       log.info(sender() + " " + sessionKeyRequest.toString)
 
       keyServerSupervisor ! sessionKeyRequest
+      
+      sender() ! "sessionKeyRequest"
     }
     case sessionKeyReply: SessionKeyReply => {
       sessionKeyReply match {

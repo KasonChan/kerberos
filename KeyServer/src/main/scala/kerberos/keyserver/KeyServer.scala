@@ -1,7 +1,7 @@
 package kerberos.keyserver
 
-import akka.actor.{ActorSystem, Props}
-import kerberos.keyserver.actor.KeyServerSupervisor
+import akka.actor.{ActorSystem, DeadLetter, Props}
+import kerberos.keyserver.actor.{KeyServerSupervisor, Listener}
 import kerberos.util.IO
 
 /**
@@ -11,9 +11,13 @@ import kerberos.util.IO
 case object Test
 
 object KeyServer {
+  //    Create key server system
+  val system = ActorSystem("KeyServerSystem")
+  
   def main(args: Array[String]) {
-    //    Create key server system
-    val system = ActorSystem("KeyServerSystem")
+    //    Create event listener actor
+    val listener = system.actorOf(Props(classOf[Listener]))
+    system.eventStream.subscribe(listener, classOf[DeadLetter])
 
     //    Create key server actor
     val keyServerSupervisor = system.actorOf(Props[KeyServerSupervisor], name = "KeyServerSupervisor")

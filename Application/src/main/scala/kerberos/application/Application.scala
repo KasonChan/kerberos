@@ -1,7 +1,8 @@
 package kerberos.application
 
-import akka.actor.{ActorSystem, Props}
-import kerberos.application.actor.ApplicationSupervisor
+import akka.actor.{DeadLetter, ActorSystem, Props}
+import kerberos.application.actor.{Listener, ApplicationSupervisor}
+import kerberos.client.actor.Listener
 import kerberos.util.IO
 
 /**
@@ -12,6 +13,10 @@ object Application {
   implicit val system = ActorSystem("ApplicationSystem")
 
   def main(args: Array[String]) {
+    //    Create event listener actor
+    val listener = system.actorOf(Props(classOf[Listener]))
+    system.eventStream.subscribe(listener, classOf[DeadLetter])
+    
     //    Create application supervisor actor
     val applicationSupervisor = system.actorOf(Props[ApplicationSupervisor],
       name = "ApplicationSupervisor")
@@ -21,6 +26,5 @@ object Application {
 
     do {
     } while (io.input() != "exit")
-
   }
 }

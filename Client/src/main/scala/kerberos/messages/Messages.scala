@@ -6,6 +6,14 @@ import kerberos.encryption.{ElGamalPublicKey, ElGamalEncryptedMsg}
  * Created by kasonchan on 1/29/15.
  */
 /**
+ * Request service and session key message *
+ * @param service Service
+ * @param CID Client id: String
+ * @param SID Application server id: String
+ */
+case class ServiceSessionKeyRequest(service: Service, CID: String, SID: String)
+
+/**
  * Requests session key message *
  * @param CID Client id: String
  * @param SID Application server id: String

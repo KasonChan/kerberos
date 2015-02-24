@@ -2,7 +2,7 @@ package kerberos.client.actor
 
 import akka.actor.{Actor, ActorRef, Props}
 import akka.routing.{ActorRefRoutee, Router, SmallestMailboxRoutingLogic}
-import kerberos.messages.{ServiceRequest, SessionKeyReply, SessionKeyRequest}
+import kerberos.messages._
 
 /**
  * Created by kasonchan on 2/15/15.
@@ -14,7 +14,8 @@ object ClientSupervisor {
     Props(new ClientActor(aHostname, aPort))
 }
 
-class ClientSupervisor(aHostname: String, aPort: String) extends Actor with akka.actor.ActorLogging {
+class ClientSupervisor(aHostname: String, aPort: String) extends Actor with
+akka.actor.ActorLogging {
   //  Create router containing 5 routee of client actor
   var router: Router = {
     val routees: Vector[ActorRefRoutee] = Vector.fill(5) {
@@ -34,7 +35,10 @@ class ClientSupervisor(aHostname: String, aPort: String) extends Actor with akka
   }
 
   def receive = {
-    case sessionKeyRequest: SessionKeyRequest => {
+    case serviceSessionKeyRequest: ServiceSessionKeyRequest => {
+      val sessionKeyRequest = SessionKeyRequest(serviceSessionKeyRequest.CID,
+        serviceSessionKeyRequest.SID)
+
       log.info(sender() + " " + sessionKeyRequest.toString)
 
       router.route(sessionKeyRequest, sender())
@@ -43,6 +47,9 @@ class ClientSupervisor(aHostname: String, aPort: String) extends Actor with akka
       log.info(sender() + " " + sessionKeyReply.toString)
 
       router.route(sessionKeyReply, sender())
+    }
+    case decryptedSessionKeyReply: DecryptedSessionKeyReply => {
+      log.info(sender() + " " + decryptedSessionKeyReply.toString)
     }
     case serviceRequest: ServiceRequest => {
       log.info(sender() + " " + serviceRequest.toString)

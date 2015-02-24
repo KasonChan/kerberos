@@ -1,13 +1,8 @@
 package kerberos.client.actor
 
 import akka.actor.{Actor, ActorSelection, Props}
-import akka.pattern.ask
-import akka.util.Timeout
 import kerberos.encryption.{ElGamal, ElGamalPrivateKey, ElGamalPublicKey}
-import kerberos.messages.{DecryptedSessionKeyReply, ServiceRequest, SessionKeyReply, SessionKeyRequest}
-
-import scala.concurrent.duration._
-import scala.concurrent.{Await, Future}
+import kerberos.messages._
 
 /**
  * Created by kasonchan on 1/29/15.
@@ -41,12 +36,26 @@ with akka.actor.ActorLogging with ElGamal {
   }
 
   def receive = {
-    case sessionKeyRequest: SessionKeyRequest => {
+    case serviceSessionKeyRequest: ServiceSessionKeyRequest => {
+      context.become(active(serviceSessionKeyRequest.service), discardOld = false)
+
+      log.info(sender() + " " + serviceSessionKeyRequest.service.toString)
+
+      self ! serviceSessionKeyRequest
+    }
+    case x => {
+      log.warning("Undefined operation: " + sender() + " " + x.toString)
+    }
+  }
+
+  def active(service: Service): Receive = {
+    case serviceSessionKeyRequest: ServiceSessionKeyRequest => {
+      val sessionKeyRequest = SessionKeyRequest(serviceSessionKeyRequest.CID,
+        serviceSessionKeyRequest.SID)
+
       log.info(sender() + " " + sessionKeyRequest.toString)
 
       keyServerSupervisor ! sessionKeyRequest
-      
-      sender() ! "sessionKeyRequest"
     }
     case sessionKeyReply: SessionKeyReply => {
       sessionKeyReply match {
@@ -62,8 +71,19 @@ with akka.actor.ActorLogging with ElGamal {
 
           val dSessionKey = ElGamalPublicKey(dSessionKeyP, dSessionKeyAlpha, dSessionKeyAA)
 
-          log.info(dCID + " " + dSID + " " + dSessionKey)
+          log.info(dCID + " " + dSID + " " + dSessionKey + " " + encryptedToken)
+
+          val decryptedSessionKeyReply = DecryptedSessionKeyReply(dCID, dSID, dSessionKey,
+            encryptedToken)
+
+          self ! decryptedSessionKeyReply
       }
+    }
+    case decryptedSessionKeyReply: DecryptedSessionKeyReply => {
+      log.info(sender() + " " + decryptedSessionKeyReply.toString)
+      log.info(service.toString)
+
+      context.unbecome()
     }
     case serviceRequest: ServiceRequest => {
       log.info(sender() + " " + serviceRequest.toString)
